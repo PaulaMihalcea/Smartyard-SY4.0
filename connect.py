@@ -48,8 +48,7 @@ child.expect('Connection successful',
 
 # Sensor configuration
 for s in range(0, len(config_handles)):
-    child.sendline('char-write-cmd {0} {1}'.format(config_handles[s], config_values[s][
-        1]))  # char-write-cmd 0x00HH 0xCCCC (where HH is the BLE characteristic handle, while CC the configuration code; activates the desired sensor)
+    child.sendline('char-write-cmd {0} {1}'.format(config_handles[s], config_values[s][1]))  # char-write-cmd 0x00HH 0xCCCC (where HH is the BLE characteristic handle, while CC the configuration code; activates the desired sensor)
     time.sleep(
         time_between_sensor_configs)  # Waits some seconds before sending next command to avoid flooding the BLE device
 
@@ -70,8 +69,7 @@ while True:
         child.expect('Characteristic value/descriptor: ', data_timeout)  # Waits for the first part of the output...
         child.expect("\r\n", data_timeout)  # ...then waits for the end of line
 
-        parser.set(str(t), str(data_handles[s][0]), str(child.before[0:data_length[
-            s]]))  # Adds a new option to the newly created section, named after the current sensor and with the received data as its value
+        parser.set(str(t), str(data_handles[s][0]), str(child.before[0:int(data_length[s])]))  # Adds a new option to the newly created section, named after the current sensor and with the received data as its value
 
         time.sleep(time_between_data_requests)  # Waits before proceeding with the next sensor
 
