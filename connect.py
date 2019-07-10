@@ -39,50 +39,53 @@ for item in f.items('data_length'):
     data_length.append(item[1])
 
 # Connection
-child = pexpect.spawn('gatttool -I')  # Runs gatttool with the interactive option and returns the child process handle needed for further commands
-child.sendline('connect {0}'.format(device_mac))  # connect 54:6C:0E:80:3F:01 (sends the string to the spawned process (gatttool))
-print('Connecting to ' + str(device_mac) + '...')
-child.expect('Connection successful', connection_timeout)  # Waits for the "Connection successful" gatttool message; timeouts in the specified time
-print('Connection successful.')
-
-# Sensor configuration
-print('Starting sensor configuration...')
-for s in range(0, len(config_handles)):
-    child.sendline('char-write-cmd {0} {1}'.format(config_handles[s], config_values[s][1]))  # char-write-cmd 0x00HH 0xCCCC (where HH is the BLE characteristic handle, while CC the configuration code; activates the desired sensor)
-    time.sleep(time_between_sensor_configs)  # Waits some seconds before sending next command to avoid flooding the BLE device
-print('Sensor configuration successful.')
-
-time.sleep(wait_after_config)  # Waits a few seconds (recommended) to allow the device to turn its sensors on; if sleep == 0, the first readings might be wrong as the sensors would still be off
-
-# Data retrieval cycle
 try:
-    print('Data retrieval cycle started. Press CTRL+C to stop.')
-    while True:
+    child = pexpect.spawn('gatttool -I')  # Runs gatttool with the interactive option and returns the child process handle needed for further commands
+    child.sendline('connect {0}'.format(device_mac))  # connect 54:6C:0E:80:3F:01 (sends the string to the spawned process (gatttool))
+    print('Connecting to ' + str(device_mac) + '...')
+    child.expect('Connection successful', connection_timeout)  # Waits for the "Connection successful" gatttool message; timeouts in the specified time
+    print('Connection successful.')
 
-        t = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # Current date and time in human-readable format
-        raw_data = {t: {}}  # Temporarily saves the new data as a dictionary
+    # Sensor configuration
+    print('Starting sensor configuration...')
+    for s in range(0, len(config_handles)):
+        child.sendline('char-write-cmd {0} {1}'.format(config_handles[s], config_values[s][1]))  # char-write-cmd 0x00HH 0xCCCC (where HH is the BLE characteristic handle, while CC the configuration code; activates the desired sensor)
+        time.sleep(time_between_sensor_configs)  # Waits some seconds before sending next command to avoid flooding the BLE device
+    print('Sensor configuration successful.')
 
-        parser = ConfigParser()
-        parser.add_section(str(t))  # Adds a new section to the data file, named after the current date and time
+    time.sleep(wait_after_config)  # Waits a few seconds (recommended) to allow the device to turn its sensors on; if sleep == 0, the first readings might be wrong as the sensors would still be off
 
-        for s in range(0, len(config_handles)):  # Data retrieval
-            child.sendline('char-read-hnd {0}'.format(data_handles[s][1]))  # char-read-hnd 0x00HH (where HH is the BLE characteristic handle)
+    # Data retrieval cycle
+    try:
+        print('Data retrieval cycle started. Press CTRL+C to stop.')
+        while True:
 
-            child.expect('Characteristic value/descriptor: ', data_timeout)  # Waits for the first part of the output...
-            child.expect("\r\n", data_timeout)  # ...then waits for the end of line
+            t = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # Current date and time in human-readable format
+            raw_data = {t: {}}  # Temporarily saves the new data as a dictionary
 
-            raw_data[t][str(data_handles[s][0])] = str(child.before[0:int(data_length[s])])  # Adds a new sensor-value pair to the temporary dictionary
+            parser = ConfigParser()
+            parser.add_section(str(t))  # Adds a new section to the data file, named after the current date and time
 
-            time.sleep(time_between_data_requests)  # Waits before proceeding with the next sensor
+            for s in range(0, len(config_handles)):  # Data retrieval
+                child.sendline('char-read-hnd {0}'.format(data_handles[s][1]))  # char-read-hnd 0x00HH (where HH is the BLE characteristic handle)
 
-        with open('data', 'a') as f:
-            f.write(str(raw_data)[1:-1] + '\n')  # Writes to the data file the raw data in a human-readable format, then adds a new line for the next reading
+                child.expect('Characteristic value/descriptor: ', data_timeout)  # Waits for the first part of the output...
+                child.expect("\r\n", data_timeout)  # ...then waits for the end of line
 
-        time.sleep(period)  # Repeats the data reading cycle every _period_ milliseconds
+                raw_data[t][str(data_handles[s][0])] = str(child.before[0:int(data_length[s])])  # Adds a new sensor-value pair to the temporary dictionary
 
-except(KeyboardInterrupt):
-    print('Stopped by user. Data is not being received anymore.')
-finally:
-    child.sendline('disconnect')  # Disconnects from the BLE device
-    child.close(force=True)
-    print('Disconnected.')
+                time.sleep(time_between_data_requests)  # Waits before proceeding with the next sensor
+
+            with open('data', 'a') as f:
+                f.write(str(raw_data)[1:-1] + '\n')  # Writes to the data file the raw data in a human-readable format, then adds a new line for the next reading
+
+            time.sleep(period)  # Repeats the data reading cycle every _period_ milliseconds
+
+    except(KeyboardInterrupt):
+        print('Stopped by user. Data is not being received anymore.')
+    finally:
+        child.sendline('disconnect')  # Disconnects from the BLE device
+        child.close(force=True)
+        print('Disconnected.')
+except(Exception):
+    print('Connection timed out. Exiting program.')
