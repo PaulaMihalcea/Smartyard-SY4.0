@@ -88,4 +88,4 @@ try:
         child.close(force=True)
         print('Disconnected.')
 except(Exception):
-    print('Connection timed out. Exiting program.')
+    print('Connection timed out or device out of range. Exiting program.')

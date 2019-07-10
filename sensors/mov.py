@@ -9,8 +9,8 @@ raw_config_data = '7f 03'  # Here's the current Config value of the sensor
 raw_config_bytes = raw_config_data.split()  # Splits the data string into bytes
 
 config_bytes = int('0x' + raw_config_bytes[1], 16)  # Conversion from hex to int
-config_bytes_bin = list(bin(config_bytes)[2:].zfill(8))  # Conversion from int to binary (every bit sets on or off a certain feature, so binary is easier to work with - see sensor Config tables)
-
+config_bytes_bin = list(bin(config_bytes)[2:].zfill(
+    8))  # Conversion from int to binary (every bit sets on or off a certain feature, so binary is easier to work with - see sensor Config tables)
 
 # Gyroscope
 
@@ -29,7 +29,8 @@ gyro_z = float(gyro_z_int) / (65536 / 500)  # Conversion to float and operations
 
 # Accelerometer
 def acc_range(acc_a):  # Function needed to determine the necessary operation to process the data, as per TI algorithm
-    acc_range_bit = int(config_bytes_bin[7] + config_bytes_bin[6], 2)  # Conversion from binary to int (to get the corresponding range value)
+    acc_range_bit = int(config_bytes_bin[7] + config_bytes_bin[6],
+                        2)  # Conversion from binary to int (to get the corresponding range value)
 
     if acc_range_bit == 0:
         r = 2
@@ -56,7 +57,6 @@ acc_y = acc_range(acc_y_f)
 acc_z_f = float(int('0x' + raw_mov_bytes[11] + raw_mov_bytes[10], 16))  # Conversion from hex to int, then float
 acc_z = acc_range(acc_z_f)
 
-
 # Magnetometer
 
 # x axis
@@ -67,7 +67,6 @@ mag_y = float(int('0x' + raw_mov_bytes[15] + raw_mov_bytes[14], 16))  # Conversi
 
 # z axis
 mag_z = float(int('0x' + raw_mov_bytes[17] + raw_mov_bytes[16], 16))  # Conversion from hex to int, then float
-
 
 print('Gyroscope      x: ' + str(gyro_x) + ' deg/s   y: ' + str(gyro_y) + ' deg/s   z: ' + str(gyro_z) + ' deg/s')
 print('')

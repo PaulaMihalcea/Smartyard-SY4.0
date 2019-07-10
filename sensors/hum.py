@@ -1,6 +1,6 @@
 # TODO Refactor as class
 
-raw_hum_data = 'd8 66 34 4d'  # Here's the data received from the sensor
+raw_hum_data = '84 62 c0 71'  # Here's the data received from the sensor
 raw_hum_bytes = raw_hum_data.split()  # Splits the data string into bytes
 
 raw_hum = int('0x' + raw_hum_bytes[3] + raw_hum_bytes[2], 16)  # Conversion from hex to int

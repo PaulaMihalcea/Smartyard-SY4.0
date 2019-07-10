@@ -15,5 +15,4 @@ else:
 
 opt = m * (0.01 * e)  # More operations as per TI algorithm
 
-
 print('Light intensity: ' + str(opt) + ' lx')
