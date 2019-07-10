@@ -55,27 +55,30 @@ print('Sensor configuration successful.')
 time.sleep(wait_after_config)  # Waits a few seconds (recommended) to allow the device to turn its sensors on; if sleep == 0, the first readings might be wrong as the sensors would still be off
 
 # Data retrieval cycle
-print('Data retrieval cycle started.')
-while True:
+try:
+    print('Data retrieval cycle started. Press CTRL+C to stop.')
+    while True:
 
-    t = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # Current date and time in human-readable format
-    raw_data = {t: {}}  # Temporarily saves the new data as a dictionary
+        t = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # Current date and time in human-readable format
+        raw_data = {t: {}}  # Temporarily saves the new data as a dictionary
 
-    parser = ConfigParser()
-    parser.add_section(str(t))  # Adds a new section to the data file, named after the current date and time
+        parser = ConfigParser()
+        parser.add_section(str(t))  # Adds a new section to the data file, named after the current date and time
 
-    for s in range(0, len(config_handles)):  # Data retrieval
-        child.sendline('char-read-hnd {0}'.format(data_handles[s][1]))  # char-read-hnd 0x00HH (where HH is the BLE characteristic handle)
+        for s in range(0, len(config_handles)):  # Data retrieval
+            child.sendline('char-read-hnd {0}'.format(data_handles[s][1]))  # char-read-hnd 0x00HH (where HH is the BLE characteristic handle)
 
-        child.expect('Characteristic value/descriptor: ', data_timeout)  # Waits for the first part of the output...
-        child.expect("\r\n", data_timeout)  # ...then waits for the end of line
+            child.expect('Characteristic value/descriptor: ', data_timeout)  # Waits for the first part of the output...
+            child.expect("\r\n", data_timeout)  # ...then waits for the end of line
 
-        raw_data[t][str(data_handles[s][0])] = str(child.before[0:int(data_length[s])])  # Adds a new sensor-value pair to the temporary dictionary
+            raw_data[t][str(data_handles[s][0])] = str(child.before[0:int(data_length[s])])  # Adds a new sensor-value pair to the temporary dictionary
 
-        time.sleep(time_between_data_requests)  # Waits before proceeding with the next sensor
+            time.sleep(time_between_data_requests)  # Waits before proceeding with the next sensor
 
-    with open('data', 'a') as f:
-        f.write(str(raw_data)[1:-1])  # Writes to the data file the raw data in a human-readable format
-        f.write('\n')  # Adds a new line for the next reading
+        with open('data', 'a') as f:
+            f.write(str(raw_data)[1:-1] + '\n')  # Writes to the data file the raw data in a human-readable format, then adds a new line for the next reading
 
-    time.sleep(period)  # Repeats the data reading cycle every _period_ milliseconds
+        time.sleep(period)  # Repeats the data reading cycle every _period_ milliseconds
+
+except(KeyboardInterrupt):
+    print('Stopped by user. Data is not being received anymore.')
