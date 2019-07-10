@@ -82,3 +82,7 @@ try:
 
 except(KeyboardInterrupt):
     print('Stopped by user. Data is not being received anymore.')
+finally:
+    child.sendline('disconnect')  # Disconnects from the BLE device
+    child.close(force=True)
+    print('Disconnected.')
