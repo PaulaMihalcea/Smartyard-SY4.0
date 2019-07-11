@@ -9,6 +9,8 @@ import pexpect
 
 
 # Setup
+status = False  # Status flag; remains false until a connection has been established
+
 f = ConfigParser()
 
 f.read('setup.ini')  # Parses the setup.ini file
@@ -44,6 +46,7 @@ try:
     child.sendline('connect {0}'.format(device_mac))  # connect 54:6C:0E:80:3F:01 (sends the string to the spawned process (gatttool))
     print('Connecting to ' + str(device_mac) + '...')
     child.expect('Connection successful', connection_timeout)  # Waits for the "Connection successful" gatttool message; timeouts in the specified time
+    status = True
     print('Connection successful.')
 
     # Sensor configuration
@@ -57,7 +60,7 @@ try:
 
     # Data retrieval cycle
     try:
-        print('Data retrieval cycle started. Press CTRL+C to stop.')
+        print('Data retrieval cycle started. Press CTRL+C to stop and disconnect.')
         while True:
 
             t = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # Current date and time in human-readable format
@@ -82,10 +85,13 @@ try:
             time.sleep(period)  # Repeats the data reading cycle every _period_ milliseconds
 
     except(KeyboardInterrupt):
-        print('Stopped by user. Data is not being received anymore.')
+        print('\n Stopped by user. Data is not being received anymore.')
     finally:
         child.sendline('disconnect')  # Disconnects from the BLE device
         child.close(force=True)
         print('Disconnected.')
 except(Exception):
-    print('Connection timed out or device out of range. Exiting program.')
+    if status:
+        print('Disconnected, device out of range. Exiting program.')
+    else:
+        print('Connection timed out. Exiting program.')
