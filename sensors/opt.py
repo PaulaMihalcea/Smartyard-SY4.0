@@ -1,8 +1,9 @@
-# TODO Refine
+# Device: TI SimpleLink SensorTag CC2650STK
+
 
 def opt(raw_opt_data):
 
-    # raw_opt_data = '59 8d'  # Here's the data received from the sensor
+    # raw_opt_data = '59 8d'  # Here's some test data received from the sensor
     raw_opt_bytes = raw_opt_data.split()  # Splits the data string into bytes
 
     raw_opt = int('0x' + raw_opt_bytes[1] + raw_opt_bytes[0], 16)  # Conversion from hex to int

@@ -1,3 +1,19 @@
+decimals = 2
+
+
+def round_data(list, decimals):
+    for e in list:
+        e = round(e, decimals)
+
+    return list
+
+
+
+
+
+
+
+
 from configparser import ConfigParser
 import pandas as pd
 
@@ -27,7 +43,7 @@ res = eval(str(ls).replace('[', '{').replace(']', '}').replace('"', ''))  # Repl
 df = pd.DataFrame.from_dict(res, orient='index')  # Defines the dataframe
 
 for i in range(0,  len(cols)):  # Processes the data for each column (= sensor type) with the available sensor modules (= processing algorithms)
-    df[cols[i]] = round(df[cols[i]].map(eval(cols[i])), 2)
+    df[cols[i]] = round_data(df[cols[i]].map(eval(cols[i])), 2)  # TODO Qui non funziona per il sensore di movimento, vanno implementate funzioni multiple
 
 print(df)
 #print(df['temp'])
