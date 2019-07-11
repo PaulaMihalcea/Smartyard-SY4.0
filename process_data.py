@@ -1,19 +1,3 @@
-decimals = 2
-
-
-def round_data(list, decimals):
-    for e in list:
-        e = round(e, decimals)
-
-    return list
-
-
-
-
-
-
-
-
 from configparser import ConfigParser
 import pandas as pd
 
@@ -24,9 +8,12 @@ f.read('setup.ini')  # Parses the setup.ini file
 cols = []
 i = 0
 for item in f.items('data_handles'):  # Reads the available type of retrievable data
-    cols.append(item[0])  # Creates the column list
-    exec('from sensors.{0} import {0}'.format(cols[i]))  # Dynamically imports the sensor modules
-    i = i + 1  # Does this really need an explanation?
+    if(item[0] == 'mov'):  # Ignores the movement sensor
+        pass
+    else:
+        cols.append(item[0])  # Creates the column list
+        exec('from sensors.{0} import {0}'.format(cols[i]))  # Dynamically imports the sensor modules
+        i = i + 1  # Does this really need an explanation?
 
 
 # Dataframe creation
@@ -43,7 +30,6 @@ res = eval(str(ls).replace('[', '{').replace(']', '}').replace('"', ''))  # Repl
 df = pd.DataFrame.from_dict(res, orient='index')  # Defines the dataframe
 
 for i in range(0,  len(cols)):  # Processes the data for each column (= sensor type) with the available sensor modules (= processing algorithms)
-    df[cols[i]] = round_data(df[cols[i]].map(eval(cols[i])), 2)  # TODO Qui non funziona per il sensore di movimento, vanno implementate funzioni multiple
+    df[cols[i]] = round(df[cols[i]].map(eval(cols[i])), 2)
 
 print(df)
-#print(df['temp'])
