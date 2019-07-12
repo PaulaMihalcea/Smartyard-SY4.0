@@ -31,12 +31,20 @@ axes[0].plot(df['index'], df['temp'])
 axes[0].set(ylabel='temperature (°C)', title='Environmental variables')
 axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%h %d - %H:%M'))
 
-df_0 = process_data('data2')  # Loads the processed data from the specified file
+# Humidity
+axes[1].plot(df['index'], df['hum'])
+axes[1].set(ylabel='humidity (%)')
+axes[1].xaxis.set_major_formatter(mdates.DateFormatter('%h %d - %H:%M'))
 
-df = df_0.reset_index()  # Resets the index to a column; useful for plotting
+# Pressure
+axes[2].plot(df['index'], df['bar'])
+axes[2].set(ylabel='pressure (hPa)')
+axes[2].xaxis.set_major_formatter(mdates.DateFormatter('%h %d - %H:%M'))
 
-df.plot(x='index', y='temp')
-plt.show()
+# Light intensity
+axes[3].plot(df['index'], df['opt'])
+axes[3].set(ylabel='light intensity (lx)')
+axes[3].xaxis.set_major_formatter(mdates.DateFormatter('%h %d - %H:%M'))
 
-df.plot(x='index', y='opt')
+
 plt.show()
