@@ -7,7 +7,10 @@ from configparser import ConfigParser
 register_matplotlib_converters()
 
 # Local variables
-data_file = 'data_test'
+data_file_1 = 'data'
+data_file_2 = 'data2'
+MAC_1 = '54:6C:0E:80:3F:01'
+MAC_2 = '98:07:2D:32:23:80'
 tick_interval = 10  # Time interval between ticks on the x axis, in minutes
 window_title = 'SensorTag CC2650'  # Plot window title
 ncols = 1  # Number of columns (for subplots)
@@ -27,20 +30,30 @@ for item in f.items('data_handles'):  # Reads the available type of retrievable 
         cols.append(item[0])  # Creates the column list
 
 
-# Data loading and processing
-df = process_data(data_file)  # Loads the processed data from the specified file
+# Data loading and processing 1
+df_1 = process_data(data_file_1)  # Loads the processed data from the specified file
 
-df = df.reset_index()  # Resets the index to a column; useful for plotting
-df = df.set_index(['index'])  # Sets the date column as index
+df_1 = df_1.reset_index()  # Resets the index to a column; useful for plotting
+df_1 = df_1.set_index(['index'])  # Sets the date column as index
 # df = df.loc['2019-07-11 13:00:00.000':'2019-07-11 14:00:00.000']  # Prints only the data from the selected time interval
 
-df = df.reset_index()  # Resets the index to a column; useful for plotting
-df['index'] = pd.to_datetime(df['index'], format='%Y-%m-%d %H:%M:%S.%f')  # Converts the index to a date format
+df_1 = df_1.reset_index()  # Resets the index to a column; useful for plotting
+df_1['index'] = pd.to_datetime(df_1['index'], format='%Y-%m-%d %H:%M:%S.%f')  # Converts the index to a date format
+
+# Data loading and processing 2
+df_2 = process_data(data_file_2)  # Loads the processed data from the specified file
+
+df_2 = df_2.reset_index()  # Resets the index to a column; useful for plotting
+df_2 = df_2.set_index(['index'])  # Sets the date column as index
+# df = df.loc['2019-07-11 13:00:00.000':'2019-07-11 14:00:00.000']  # Prints only the data from the selected time interval
+
+df_2 = df_2.reset_index()  # Resets the index to a column; useful for plotting
+df_2['index'] = pd.to_datetime(df_2['index'], format='%Y-%m-%d %H:%M:%S.%f')  # Converts the index to a date format
 
 
 # Plot settings
 fig, ax = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, figsize=(9, 6))  # Plot definition, with number of subplots and layout
-plt.gcf().canvas.set_window_title(window_title)  # Window titles
+plt.gcf().canvas.set_window_title(window_title)  # Window title
 plt.gcf().autofmt_xdate()  # Rotation
 ax[0].xaxis.set_major_locator(mdates.MinuteLocator(interval=tick_interval))  # x axis tick interval
 
@@ -48,7 +61,9 @@ ax[0].xaxis.set_major_locator(mdates.MinuteLocator(interval=tick_interval))  # x
 # Subplot creation
 # NB This specific framework is valid for any plot with 4 subplots
 for i in range(0, nrows):
-    ax[i].plot(df['index'], df[cols[i]])
+    line_1, = ax[i].plot(df_1['index'], df_1[cols[i]])
+    line_2, = ax[i].plot(df_2['index'], df_2[cols[i]])
+fig.legend((line_1, line_2), (MAC_1, MAC_2), loc='lower center', ncol=2)
 
 
 # x axis label formatter, in this case the same for all subplots. If sharex == True (when initially defining the plot), only one needs to be specified at any time
