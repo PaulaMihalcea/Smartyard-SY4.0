@@ -2,7 +2,7 @@ from elasticsearch import Elasticsearch
 import json
 
 # Connect to the elastic cluster
-es=Elasticsearch([{'host':'localhost','port':9200}])
+es = Elasticsearch([{'host':'localhost','port':9200}])
 
 # print(es)
 
@@ -35,12 +35,19 @@ with open('json', 'r') as j:
 
 
 # Aggiunge al DB gli elementi caricati dal file
-i = 1
-for el in json_data:
-    # print(el)
-    # res = es.index(index='sensortag',doc_type='sensor_reading',id=i,body=el)  # Add element to DB
-    i = i + 1
+# for el in json_data:
+#      print(el['date'])
+#      res = es.index(index='sensortag',doc_type='sensor_reading',id=el['date'],body=el)  # Add element to DB
 
-res=es.get(index='sensortag',doc_type='sensor_reading',id=45)  # Search for element by query
+# res=es.get(index='sensortag',doc_type='sensor_reading',id=45)  # Search for element by query
 
-print(res)
+# SCRIPT GENERALE PER CANCELLARE X RECORD DAL DB
+# for i in range(1,362):
+#     res=es.delete(index='sensortag',doc_type='sensor_reading',id=i)
+#     print(res['result'])
+
+# print(es.get(index='sensortag',doc_type='sensor_reading',id='2019-07-12 14:56:48.234'))
+
+# print(res)
+
+print(es.search(index="sensortag", body={"query": {"prefix" : { "id" : "2019-07-12" }}}))

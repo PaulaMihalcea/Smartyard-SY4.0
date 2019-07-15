@@ -1,10 +1,10 @@
-import pandas as pd
 import json
 from process_data import process_data
 from configparser import ConfigParser
+from pprint import pprint  # Pretty print (for readable JSON)
 
 # Local variables
-data_file = 'data_test'
+data_file = 'data2_15'
 
 # Column (and subplot) definition
 f = ConfigParser()
@@ -43,8 +43,8 @@ e1 = {
 
 j = 1
 for i in jdict:
-    i['id'] = j
-    j = j + 1
+    #i['id'] = j
+    #j = j + 1
     i = json.dumps(i)
 
 # print(jdict)  # jdict è una lista di records json
@@ -52,8 +52,8 @@ for i in jdict:
 # print(json.dumps(jdict))
 
 #with open('json', 'w') as file:
-#    json.dump(jdict, file)
+    #json.dump(jdict, file, indent=3, sort_keys=True)
 
 with open('json', 'r') as j:
     json_data = json.load(j)
-    print(json_data)
+    pprint(json_data)
