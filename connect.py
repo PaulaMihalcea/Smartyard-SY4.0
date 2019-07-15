@@ -89,6 +89,7 @@ try:
     finally:
         child.sendline('disconnect')  # Disconnects from the BLE device
         child.close(force=True)
+        status = False
         print('Disconnected.')
 except(Exception):
     if status:
