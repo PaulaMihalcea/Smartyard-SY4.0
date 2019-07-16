@@ -1,59 +1,37 @@
-import json
-from process_data import process_data
-from configparser import ConfigParser
-from pprint import pprint  # Pretty print (for readable JSON)
+def raw2json(save_to):
 
-# Local variables
-data_file = 'data2_15'
+    import json
+    from process_data import process_data
+    from configparser import ConfigParser
+    from pprint import pprint  # Pretty print (for readable JSON) - Only needed for debug
 
-# Column (and subplot) definition
-f = ConfigParser()
-f.read('setup.ini')  # Parses the setup.ini file
+    # Local variables
+    raw_data_file = 'data2_15'  # Raw data file (the one containing the data that needs to be processed)
+    setup_file = 'setup.ini'  # Setup file (only needed to read the available sensors)
+    # save_to = 'data_json'  # Default processed data file (the one which is going to be put in the database)
 
-cols = []
-i = 0
-for item in f.items('data_handles'):  # Reads the available type of retrievable data
-    if item[0] == 'mov':  # Ignores the movement sensor
-        pass
-    else:
-        cols.append(item[0])  # Creates the column list
+    # Setup file parsing
+    f = ConfigParser()
+    f.read(setup_file)  # Parses the setup.ini file
 
+    # Data loading and processing
+    df = process_data(raw_data_file)  # Creates a data frame from the specified raw data file
+    df.index.name = 'date'  # Sets the index column name
+    df = df.reset_index()  # Resets the index to a column; useful for plotting
 
-# Data loading and processing
-df = process_data(data_file)  # Loads the processed data from the specified file
+    jdict = df.to_dict('records')  # Converts the dataframe in a Python dictionary
 
-df.index.name = 'date'  # Sets the index column name
-df = df.reset_index()  # Resets the index to a column; useful for plotting
-# df = df.set_index(['index'])  # Sets the date column as index
-# df = df.loc['2019-07-11 13:00:00.000':'2019-07-11 14:00:00.000']  # Prints only the data from the selected time interval
+    # JSON conversion
+    for i in jdict:
+        i = json.dumps(i)
 
-#df = df.reset_index()  # Resets the index to a column; useful for plotting
-# df['index'] = pd.to_datetime(df['index'], format='%Y-%m-%d %H:%M:%S.%f')  # Converts the index to a date format
+    # Save to file
+    with open(save_to, 'w') as file:
+        json.dump(jdict, file, indent=3, sort_keys=True)
 
-jdict = df.to_dict('records')
+    # Open from file - Only needed for debug
+    # with open(save_to, 'r') as j:
+    #     json_data = json.load(j)
+    #     pprint(json_data)
 
-e1 = {
-    'date': '2019-07-12 14:48:46.415',
-    'opt': '10 00',
-    'hum': '20 68 f8 61',
-    'bar': 'a8 0a 00 2c 89 01',
-    'mov': 'c3 ff 06 01 2d 00 35 00 16 00 91 f7 7c 03 00 ff 4d fe',
-    'temp': 'd4 0a 74 0d'
-}
-
-j = 1
-for i in jdict:
-    #i['id'] = j
-    #j = j + 1
-    i = json.dumps(i)
-
-# print(jdict)  # jdict è una lista di records json
-
-# print(json.dumps(jdict))
-
-#with open('json', 'w') as file:
-    #json.dump(jdict, file, indent=3, sort_keys=True)
-
-with open('json', 'r') as j:
-    json_data = json.load(j)
-    pprint(json_data)
+    return 0
