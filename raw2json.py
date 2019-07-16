@@ -1,4 +1,4 @@
-def raw2json(save_to):
+def raw2json(raw_data_file, save_to):
 
     import json
     from process_data import process_data
@@ -6,7 +6,7 @@ def raw2json(save_to):
     from pprint import pprint  # Pretty print (for readable JSON) - Only needed for debug
 
     # Local variables
-    raw_data_file = 'data2_15'  # Raw data file (the one containing the data that needs to be processed)
+    # raw_data_file = 'data_test'  # Default raw data file (the one containing the data that needs to be processed)
     setup_file = 'setup.ini'  # Setup file (only needed to read the available sensors)
     # save_to = 'data_json'  # Default processed data file (the one which is going to be put in the database)
 
@@ -34,4 +34,4 @@ def raw2json(save_to):
     #     json_data = json.load(j)
     #     pprint(json_data)
 
-    return 0
+    return jdict
