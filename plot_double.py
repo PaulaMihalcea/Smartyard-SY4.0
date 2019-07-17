@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.dates as mdates
 from pandas.plotting import register_matplotlib_converters
-from process_data import process_data
+from raw2df import raw2df
 from configparser import ConfigParser
 register_matplotlib_converters()
 
@@ -31,7 +31,7 @@ for item in f.items('data_handles'):  # Reads the available type of retrievable 
 
 
 # Data loading and processing 1
-df_1 = process_data(data_file_1)  # Loads the processed data from the specified file
+df_1 = raw2df(data_file_1)  # Loads the processed data from the specified file
 
 df_1 = df_1.reset_index()  # Resets the index to a column; useful for plotting
 df_1 = df_1.set_index(['index'])  # Sets the date column as index
@@ -41,7 +41,7 @@ df_1 = df_1.reset_index()  # Resets the index to a column; useful for plotting
 df_1['index'] = pd.to_datetime(df_1['index'], format='%Y-%m-%d %H:%M:%S.%f')  # Converts the index to a date format
 
 # Data loading and processing 2
-df_2 = process_data(data_file_2)  # Loads the processed data from the specified file
+df_2 = raw2df(data_file_2)  # Loads the processed data from the specified file
 
 df_2 = df_2.reset_index()  # Resets the index to a column; useful for plotting
 df_2 = df_2.set_index(['index'])  # Sets the date column as index

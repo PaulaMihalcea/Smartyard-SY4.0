@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.dates as mdates
 from pandas.plotting import register_matplotlib_converters
-from process_data import process_data
+from raw2df import raw2df
 from configparser import ConfigParser
 register_matplotlib_converters()
 
@@ -28,7 +28,7 @@ for item in f.items('data_handles'):  # Reads the available type of retrievable 
 
 
 # Data loading and processing
-df = process_data(data_file)  # Loads the processed data from the specified file
+df = raw2df(data_file)  # Loads the processed data from the specified file
 
 df = df.reset_index()  # Resets the index to a column; useful for plotting
 df = df.set_index(['index'])  # Sets the date column as index

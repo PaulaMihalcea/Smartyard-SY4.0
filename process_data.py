@@ -1,41 +1,54 @@
-def process_data(datafile):
+# TODO save local parameters in external file
 
-    from configparser import ConfigParser
-    import pandas as pd
+from configparser import ConfigParser
+from elasticsearch import Elasticsearch
+from df2json import df2json
+import time
+import json
 
-    # Modules import and column definition
-    f = ConfigParser()
-    f.read('setup.ini')  # Parses the setup.ini file
+# Setup
+f = ConfigParser()
+f.read('setup_db.ini')  # Parses the setup_db.ini file
 
-    cols = []
-    i = 0
-    for item in f.items('data_handles'):  # Reads the available type of retrievable data
-        if(item[0] == 'mov'):  # Ignores the movement sensor
-            pass
+host = f.get('database', 'host')
+port = f.get('database', 'port')
+index = str(f.get('database', 'index'))
+doc_type = str(f.get('database', 'doc_type'))
+
+raw_data_file = str(f.get('files', 'raw_data_file'))
+
+period = f.getint('wait_time', 'period') / 1000  # Times is in milliseconds
+
+
+# Connection to the ElasticSearch cluster
+print('Connecting to ElasticSearch database...')
+es = Elasticsearch([{'host': host,'port': port}])
+print('Connection successful.')
+
+
+# Data processing cycle
+with open('last.date', 'r') as s:
+    last = s.read()# Another setup file, used to save the date of the last reading that has been sent to the database
+
+print('Starting data processing cycle...')
+
+while True:
+    # Raw data file processing (raw to dataframe, then dataframe to json)
+    data = df2json(raw_data_file)
+    print('Raw data loaded and processed.')
+
+    # Adds to the ElasticSearch database the previously loaded data
+    print('Starting POSTs...')
+    for e in data:
+        if last < e['date']:  # Adds new data to database only if more recent than the last item added (saved in the specific file last.date)
+            es.index(index=index, doc_type=doc_type, body=e, id=e['date'])  # Adds element to DB with the date as unique id
+            last = e['date']
         else:
-            cols.append(item[0])  # Creates the column list
-            exec('from sensors.{0} import {0}'.format(cols[i]))  # Dynamically imports the sensor modules
-            i = i + 1  # Does this really need an explanation?
+            pass
 
+    with open('last.date', 'w') as s:
+        s.write(last)# Another setup file, used to save the date of the last reading that has been sent to the database
 
-    # Dataframe creation
-    h = open(datafile, 'r')  # Opens the data file in read mode
+    print('Data has been successfully added to database.')
 
-    ls = []
-    for x in h:  # Creates a list with all available data
-        ls.append(x[:-1])
-
-    res = eval(str(ls).replace('[', '{').replace(']', '}').replace('"', ''))  # Replaces a few characters in the retrieved data to transform it in a Python dictionary
-
-
-    # Dataframe
-    df = pd.DataFrame.from_dict(res, orient='index')  # Defines the dataframe
-    df = df.drop(['mov'], axis=1)
-    df.index.name = 'index'  # Sets the index column name
-
-    for i in range(0,  len(cols)):  # Processes the data for each column (= sensor type) with the available sensor modules (= processing algorithms)
-        df[cols[i]] = round(df[cols[i]].map(eval(cols[i])), 2)
-
-    # print(df)
-
-    return df
+    time.sleep(period)

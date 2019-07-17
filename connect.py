@@ -17,7 +17,7 @@ f.read('setup.ini')  # Parses the setup.ini file
 
 device_mac = f.get('device_mac', 'value')
 
-connection_timeout = f.getint('wait_time', 'connection_timeout') / 1000  # All times are in millseconds
+connection_timeout = f.getint('wait_time', 'connection_timeout') / 1000  # All times are in milliseconds
 data_timeout = f.getint('wait_time', 'data_timeout') / 1000
 wait_after_config = f.getint('wait_time', 'wait_after_config') / 1000
 time_between_sensor_configs = f.getint('wait_time', 'time_between_sensor_configs') / 1000
@@ -63,7 +63,8 @@ try:
         print('Data retrieval cycle started. Press CTRL+C to stop and disconnect.')
         while True:
 
-            t = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]  # Current date and time in human-readable format
+            t = datetime.now().isoformat()[:-3]  # Current date and time in standard ISO8601 format
+            filename = 'logs/' + str(datetime.now().strftime('%Y-%m-%d.log'))
             raw_data = {t: {}}  # Temporarily saves the new data as a dictionary
 
             parser = ConfigParser()
@@ -79,7 +80,9 @@ try:
 
                 time.sleep(time_between_data_requests)  # Waits before proceeding with the next sensor
 
-            with open('data', 'a') as f:
+            raw_data[t]['MAC'] = str(device_mac)  # Adds the current device MAC to the raw data, to easily identify who read the readings
+
+            with open(filename, 'a+') as f:
                 f.write(str(raw_data)[1:-1] + '\n')  # Writes to the data file the raw data in a human-readable format, then adds a new line for the next reading
 
             time.sleep(period)  # Repeats the data reading cycle every _period_ milliseconds

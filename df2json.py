@@ -1,7 +1,7 @@
-def raw2json(raw_data_file, save_to):
+def df2json(raw_data_file):
 
     import json
-    from process_data import process_data
+    from raw2df import raw2df
     from configparser import ConfigParser
     from pprint import pprint  # Pretty print (for readable JSON) - Only needed for debug
 
@@ -15,7 +15,7 @@ def raw2json(raw_data_file, save_to):
     f.read(setup_file)  # Parses the setup.ini file
 
     # Data loading and processing
-    df = process_data(raw_data_file)  # Creates a data frame from the specified raw data file
+    df = raw2df(raw_data_file)  # Creates a data frame from the specified raw data file
     df.index.name = 'date'  # Sets the index column name
     df = df.reset_index()  # Resets the index to a column; useful for plotting
 
@@ -24,10 +24,6 @@ def raw2json(raw_data_file, save_to):
     # JSON conversion
     for i in jdict:
         i = json.dumps(i)
-
-    # Save to file
-    with open(save_to, 'w') as file:
-        json.dump(jdict, file, indent=3, sort_keys=True)
 
     # Open from file - Only needed for debug
     # with open(save_to, 'r') as j:
