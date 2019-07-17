@@ -1,14 +1,11 @@
-# TODO save local parameters in external file
-
 from configparser import ConfigParser
 from elasticsearch import Elasticsearch
-from df2json import df2json
+from modules import df2json as d
 import time
-import json
 
 # Setup
 f = ConfigParser()
-f.read('setup_db.ini')  # Parses the setup_db.ini file
+f.read('config/setup_db.ini')  # Parses the setup_db.ini file
 
 host = f.get('database', 'host')
 port = f.get('database', 'port')
@@ -27,14 +24,15 @@ print('Connection successful.')
 
 
 # Data processing cycle
-with open('last.date', 'r') as s:
+with open('settings/last.date', 'r') as s:
     last = s.read()# Another setup file, used to save the date of the last reading that has been sent to the database
 
 print('Starting data processing cycle...')
 
 while True:
     # Raw data file processing (raw to dataframe, then dataframe to json)
-    data = df2json(raw_data_file)
+    raw_data_file = 'config/' + raw_data_file
+    data = d.df2json(raw_data_file)
     print('Raw data loaded and processed.')
 
     # Adds to the ElasticSearch database the previously loaded data

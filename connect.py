@@ -13,7 +13,7 @@ status = False  # Status flag; remains false until a connection has been establi
 
 f = ConfigParser()
 
-f.read('setup.ini')  # Parses the setup.ini file
+f.read('config/setup.ini')  # Parses the setup.ini file
 
 device_mac = f.get('device_mac', 'value')
 

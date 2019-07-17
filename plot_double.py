@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.dates as mdates
 from pandas.plotting import register_matplotlib_converters
-from raw2df import raw2df
+from modules import raw2df as r
 from configparser import ConfigParser
 register_matplotlib_converters()
 
 # Local variables
-data_file_1 = 'data'
-data_file_2 = 'data2'
+data_file_1 = 'logs/data_test'
+data_file_2 = 'logs/data_test'
 MAC_1 = '54:6C:0E:80:3F:01'
 MAC_2 = '98:07:2D:32:23:80'
 tick_interval = 10  # Time interval between ticks on the x axis, in minutes
@@ -19,7 +19,7 @@ nrows = 4  # Number of rows (for subplots)
 
 # Column (and subplot) definition
 f = ConfigParser()
-f.read('setup.ini')  # Parses the setup.ini file
+f.read('config/setup.ini')  # Parses the setup.ini file
 
 cols = []
 i = 0
@@ -31,7 +31,7 @@ for item in f.items('data_handles'):  # Reads the available type of retrievable 
 
 
 # Data loading and processing 1
-df_1 = raw2df(data_file_1)  # Loads the processed data from the specified file
+df_1 = r.raw2df(data_file_1)  # Loads the processed data from the specified file
 
 df_1 = df_1.reset_index()  # Resets the index to a column; useful for plotting
 df_1 = df_1.set_index(['index'])  # Sets the date column as index
@@ -41,7 +41,7 @@ df_1 = df_1.reset_index()  # Resets the index to a column; useful for plotting
 df_1['index'] = pd.to_datetime(df_1['index'], format='%Y-%m-%d %H:%M:%S.%f')  # Converts the index to a date format
 
 # Data loading and processing 2
-df_2 = raw2df(data_file_2)  # Loads the processed data from the specified file
+df_2 = r.raw2df(data_file_2)  # Loads the processed data from the specified file
 
 df_2 = df_2.reset_index()  # Resets the index to a column; useful for plotting
 df_2 = df_2.set_index(['index'])  # Sets the date column as index

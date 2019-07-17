@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.dates as mdates
 from pandas.plotting import register_matplotlib_converters
-from raw2df import raw2df
+from modules import raw2df as r
 from configparser import ConfigParser
 register_matplotlib_converters()
 
 # Local variables
-data_file = 'data_test'
+data_file = 'logs/data_test'
 tick_interval = 10  # Time interval between ticks on the x axis, in minutes
 window_title = 'SensorTag CC2650'  # Plot window title
 ncols = 1  # Number of columns (for subplots)
@@ -16,7 +16,7 @@ nrows = 4  # Number of rows (for subplots)
 
 # Column (and subplot) definition
 f = ConfigParser()
-f.read('setup.ini')  # Parses the setup.ini file
+f.read('config/setup.ini')  # Parses the setup.ini file
 
 cols = []
 i = 0
@@ -28,7 +28,7 @@ for item in f.items('data_handles'):  # Reads the available type of retrievable 
 
 
 # Data loading and processing
-df = raw2df(data_file)  # Loads the processed data from the specified file
+df = r.raw2df(data_file)  # Loads the processed data from the specified file
 
 df = df.reset_index()  # Resets the index to a column; useful for plotting
 df = df.set_index(['index'])  # Sets the date column as index
