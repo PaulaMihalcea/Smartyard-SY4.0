@@ -63,7 +63,7 @@ try:
         print('Data retrieval cycle started. Press CTRL+C to stop and disconnect.')
         while True:
 
-            t = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # Current date and time in human-readable format
+            t = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]  # Current date and time in human-readable format
             raw_data = {t: {}}  # Temporarily saves the new data as a dictionary
 
             parser = ConfigParser()
