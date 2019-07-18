@@ -1,7 +1,11 @@
 from configparser import ConfigParser
 from elasticsearch import Elasticsearch
-from modules import df2json as d
+from datetime import datetime
+from modules import update_db as u
+from modules import min_date as m
+from modules import increase_day as i
 import time
+import os
 
 # Setup
 f = ConfigParser()
@@ -12,8 +16,6 @@ port = f.get('database', 'port')
 index = str(f.get('database', 'index'))
 doc_type = str(f.get('database', 'doc_type'))
 
-raw_data_file = str(f.get('files', 'raw_data_file'))
-
 period = f.getint('wait_time', 'period') / 1000  # Times is in milliseconds
 
 
@@ -23,30 +25,45 @@ es = Elasticsearch([{'host': host,'port': port}])
 print('Connection successful.')
 
 
+# Raw data file selection
+with open('config/last.date', 'r') as f:
+    last_dates = eval(f.read())
+min_date = m.min_date(last_dates)  # Finds the last day the database has been updated (for any device)
+
+date = min_date
+raw_data_file = min_date + '.log'  # The script will start adding entries to the database from the last day it updated it
+
 # Data processing cycle
-with open('settings/last.date', 'r') as s:
-    last = s.read()# Another setup file, used to save the date of the last reading that has been sent to the database
+today = str(datetime.now())[0:10]
 
 print('Starting data processing cycle...')
 
+# Old logs retireval
+print('Checking for old logs...')
+while today > date:
+    path = './logs/' + raw_data_file
+
+    if os.path.isfile(path):  # Checks if the log exists...
+        u.update_db(raw_data_file, last_dates, es, index, doc_type)  # This function will also rewrite the last day the database has been updated (the min)
+    else:  # ...otherwise just goes to the next day, and continues checking
+        pass
+
+    date = i.increase_day(date)
+    raw_data_file = date + '.log'
+
+print('Old logs check successful.')
+
+# Current day loading
+print('Starting data processing loop...')
 while True:
-    # Raw data file processing (raw to dataframe, then dataframe to json)
-    raw_data_file = 'config/' + raw_data_file
-    data = d.df2json(raw_data_file)
-    print('Raw data loaded and processed.')
+    if today[8:10] < str(datetime.now())[8:10]:  # Checks if the day has changed (increased)
+        today = str(datetime.now())[0:10]
+        raw_data_file = today + '.log'
+    else:
+        pass
 
-    # Adds to the ElasticSearch database the previously loaded data
-    print('Starting POSTs...')
-    for e in data:
-        if last < e['date']:  # Adds new data to database only if more recent than the last item added (saved in the specific file last.date)
-            es.index(index=index, doc_type=doc_type, body=e, id=e['date'])  # Adds element to DB with the date as unique id
-            last = e['date']
-        else:
-            pass
+    u.update_db(raw_data_file, last_dates, es, index, doc_type)  # Updates the database with data from raw_data_file
 
-    with open('last.date', 'w') as s:
-        s.write(last)# Another setup file, used to save the date of the last reading that has been sent to the database
-
-    print('Data has been successfully added to database.')
+    print('Waiting for next iteration...')
 
     time.sleep(period)
