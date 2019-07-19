@@ -32,7 +32,7 @@ def raw2df(raw_data_file):
 
     h.close()
 
-    res = str(ls).replace('[', '{').replace(']', '}').replace('"', '')  # Replaces a few characters in the retrieved data to transform it in a Python dictionary
+    res = eval(str(ls).replace('[', '{').replace(']', '}').replace('"b', '').replace('"', '').replace('\\r', ''))  # Replaces a few characters in the retrieved data to transform it in a Python dictionary
 
 
     # Dataframe

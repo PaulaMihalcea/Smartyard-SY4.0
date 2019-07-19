@@ -36,7 +36,7 @@ raw_data_file = min_date + '.log'  # The script will start adding entries to the
 # Data processing cycle
 today = str(datetime.now())[0:10]
 
-print('Starting data processing cycle...')
+print('')
 
 # Old logs retireval
 status = False
@@ -53,23 +53,38 @@ while today > date:
     date = i.increase_day(date)
     raw_data_file = date + '.log'
 
-print('Old logs check successful.\n')
-if not status:
-    print('No old logs found.\n')
+print('Old logs check successful.')
+if status:
+    print('No old logs found.')
 else:
     print('Old logs successfully added to database.')
 
+print('')
+
 # Current day loading
-print('Starting data processing loop...')
-while True:
-    if today[8:10] < str(datetime.now())[8:10]:  # Checks if the day has changed (increased)
-        today = str(datetime.now())[0:10]
-        raw_data_file = today + '.log'
-    else:
-        pass
+print('Starting data processing loop.')
 
-    u.update_db(raw_data_file, last_dates, es, index, doc_type)  # Updates the database with data from raw_data_file
+print('')
 
-    print('Waiting for next iteration...')
+try:
+    while True:
+        print('Checking for new data...')
+        if today[8:10] < str(datetime.now())[8:10]:  # Checks if the day has changed (increased)
+            today = str(datetime.now())[0:10]
+            raw_data_file = today + '.log'
+        else:
+            pass
 
-    time.sleep(period)
+        up_status = u.update_db(raw_data_file, last_dates, es, index, doc_type)  # Updates the database with data from raw_data_file
+
+        if up_status:
+            print('Data has been successfully added to database. (' + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%s'))[:-7] + ')')
+        else:
+            print('No new data found. (' + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%s'))[:-7] + ')')
+
+        print('Waiting for next check...\n')
+
+        time.sleep(period)
+
+except(KeyboardInterrupt):
+    print('\n Stopped by user. Database is not being updated anymore.')
