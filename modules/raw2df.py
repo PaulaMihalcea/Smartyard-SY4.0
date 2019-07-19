@@ -5,6 +5,7 @@ def raw2df(raw_data_file):
 
     # Modules import and column definition
     f = ConfigParser()
+    path = './config/setup.ini' + raw_data_file
     f.read('config/setup.ini')  # Parses the setup.ini file
 
     device_mac = str(f.get('device_mac', 'value'))
@@ -29,7 +30,9 @@ def raw2df(raw_data_file):
     for x in h:  # Creates a list with all available data
         ls.append(x[:-1])
 
-    res = eval(str(ls).replace('[', '{').replace(']', '}').replace('"', ''))  # Replaces a few characters in the retrieved data to transform it in a Python dictionary
+    h.close()
+
+    res = str(ls).replace('[', '{').replace(']', '}').replace('"', '')  # Replaces a few characters in the retrieved data to transform it in a Python dictionary
 
 
     # Dataframe

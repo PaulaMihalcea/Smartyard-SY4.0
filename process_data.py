@@ -39,19 +39,25 @@ today = str(datetime.now())[0:10]
 print('Starting data processing cycle...')
 
 # Old logs retireval
+status = False
 print('Checking for old logs...')
 while today > date:
     path = './logs/' + raw_data_file
 
     if os.path.isfile(path):  # Checks if the log exists...
         u.update_db(raw_data_file, last_dates, es, index, doc_type)  # This function will also rewrite the last day the database has been updated (the min)
+        status = True
     else:  # ...otherwise just goes to the next day, and continues checking
         pass
 
     date = i.increase_day(date)
     raw_data_file = date + '.log'
 
-print('Old logs check successful.')
+print('Old logs check successful.\n')
+if not status:
+    print('No old logs found.\n')
+else:
+    print('Old logs successfully added to database.')
 
 # Current day loading
 print('Starting data processing loop...')

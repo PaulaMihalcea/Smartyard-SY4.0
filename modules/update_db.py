@@ -1,7 +1,6 @@
 def update_db(raw_data_file, last_dates, es, index, doc_type):
 
     from modules import df2json as d
-    import json
 
     # Raw data file processing (raw to dataframe, then dataframe to json)
     raw_data_file = 'logs/' + raw_data_file

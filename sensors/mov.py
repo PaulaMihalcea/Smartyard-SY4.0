@@ -3,6 +3,8 @@
 # Device: TI SimpleLink SensorTag CC2650STK
 # NOTE: This is a multiple sensor, therefore multiple functions must be included in any script that processes its data
 
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # Gyroscope
 def gyro(raw_mov_data):

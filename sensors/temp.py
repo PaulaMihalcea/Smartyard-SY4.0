@@ -1,5 +1,8 @@
 # Device: TI SimpleLink SensorTag CC2650STK
 
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 
 def temp(raw_temp_data):
     # raw_temp_data = 'c8 0a 68 0d'  # Here's some test data received from the sensor

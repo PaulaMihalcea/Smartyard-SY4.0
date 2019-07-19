@@ -7,12 +7,12 @@ def df2json(raw_data_file):
 
     # Local variables
     # raw_data_file = 'data_test'  # Default raw data file (the one containing the data that needs to be processed)
-    setup_file = 'setup.ini'  # Setup file (only needed to read the available sensors)
+    setup_file_path = './config/setup.ini'  # Setup file (only needed to read the available sensors)
     # save_to = 'data_json'  # Default processed data file (the one which is going to be put in the database)
 
     # Setup file parsing
     f = ConfigParser()
-    f.read(setup_file)  # Parses the setup.ini file
+    f.read(setup_file_path)  # Parses the setup.ini file
 
     # Data loading and processing
     df = r.raw2df(raw_data_file)  # Creates a data frame from the specified raw data file

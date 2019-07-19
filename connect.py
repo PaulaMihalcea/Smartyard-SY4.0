@@ -84,6 +84,7 @@ try:
 
             with open(filename, 'a+') as f:
                 f.write(str(raw_data)[1:-1] + '\n')  # Writes to the data file the raw data in a human-readable format, then adds a new line for the next reading
+                print('Raw data acquired: ', str(raw_data)[1:-1] + '\n')
 
             time.sleep(period)  # Repeats the data reading cycle every _period_ milliseconds
 

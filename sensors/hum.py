@@ -1,5 +1,7 @@
 # Device: TI SimpleLink SensorTag CC2650STK
 
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 def hum(raw_hum_data):
 
