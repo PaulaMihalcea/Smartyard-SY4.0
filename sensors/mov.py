@@ -1,5 +1,4 @@
-# TODO Fix return
-# TODO Refine
+# TODO Split this script in three or return everything as an array
 # Device: TI SimpleLink SensorTag CC2650STK
 # NOTE: This is a multiple sensor, therefore multiple functions must be included in any script that processes its data
 
@@ -7,6 +6,8 @@
 # -*- coding: utf-8 -*-
 
 # Gyroscope
+
+
 def gyro(raw_mov_data):
     # Data bytes
     # raw_mov_data = 'ad ff 27 01 00 00 00 02 4c 01 bc 3d 2f 01 8f ff 53 fe'  # Here's some test data received from the sensor
