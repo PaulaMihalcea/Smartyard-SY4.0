@@ -23,6 +23,7 @@ wait_after_config = f.getint('wait_time', 'wait_after_config') / 1000
 time_between_sensor_configs = f.getint('wait_time', 'time_between_sensor_configs') / 1000
 time_between_data_requests = f.getint('wait_time', 'time_between_data_requests') / 1000
 period = f.getint('wait_time', 'period') / 1000
+max_attempts = f.getint('wait_time', 'max_attempts')
 
 config_handles = []
 for item in f.items('config_handles'):
@@ -43,15 +44,17 @@ for item in f.items('data_length'):
 # Connection
 status = False  # Default; if true, device is connected
 user_status = False  # Default; if true, the program has been stopped by the user
+attempt_no = 1
 
 while True:
-    if not status and not user_status:
+    if not status and not user_status and attempt_no <= max_attempts:
         try:
             child = pexpect.spawn('gatttool -I')  # Runs gatttool with the interactive option and returns the child process handle needed for further commands
             child.sendline('connect {0}'.format(device_mac))  # connect 54:6C:0E:80:3F:01 (sends the string to the spawned process (gatttool))
-            print('Connecting to ' + str(device_mac) + '...')
+            print('Connecting to ' + str(device_mac) + '... (attempt no. ' + str(attempt_no) + '/' + str(max_attempts) + ')')
             child.expect('Connection successful', connection_timeout)  # Waits for the "Connection successful" gatttool message; timeouts in the specified time
             status = True
+            attempt_no = 1
             print('Connection successful.')
 
             # Sensor configuration
@@ -91,12 +94,12 @@ while True:
                     raw_data[t]['MAC'] = str(device_mac)  # Adds the current device MAC to the raw data, to easily identify who read the readings
 
                     with open(filename, 'a+') as f:
-                        f.write(str(raw_data)[1:-1] + '\n')  # Writes to the data file the raw data in a human-readable format, then adds a new line for the next reading
+                        f.write(str(raw_data).replace('"b', '').replace('"', '')[1:-1] + '\n')  # Writes to the data file the raw data in a human-readable format, then adds a new line for the next reading
                         print('Raw data acquired: ', str(raw_data).replace('"b', '').replace('"', '')[1:-1] + '\n')
 
                     time.sleep(period)  # Repeats the data reading cycle every _period_ milliseconds
 
-            except(KeyboardInterrupt):
+            except KeyboardInterrupt:
                 print('\n Stopped by user. Data is not being received anymore.')
                 user_status = True
                 child.sendline('disconnect')  # Disconnects from the BLE device
@@ -104,7 +107,7 @@ while True:
                 status = False
                 print('Disconnected. Exiting program.')
                 exit()
-        except(Exception):
+        except Exception:
             user_status = False
             if status:
                 status = False
@@ -113,5 +116,9 @@ while True:
             else:
                 user_status = False
                 print('Connection timed out. Retrying.')
+                attempt_no += 1
+                if attempt_no > max_attempts:
+                    print('Maximum number of attempts reached. Exiting program.')
+                    exit()
     else:
         pass

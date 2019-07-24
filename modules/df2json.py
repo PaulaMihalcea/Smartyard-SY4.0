@@ -6,9 +6,9 @@ def df2json(raw_data_file):
     from pprint import pprint  # Pretty print (for readable JSON) - Only needed for debug
 
     # Local variables
-    # raw_data_file = 'data_test'  # Default raw data file (the one containing the data that needs to be processed)
+    # raw_data_file = './logs/data_test'  # Default raw data file (the one containing the data that needs to be processed)
     setup_file_path = './config/setup.ini'  # Setup file (only needed to read the available sensors)
-    # save_to = 'data_json'  # Default processed data file (the one which is going to be put in the database)
+    # save_to = 'data_json'  # Default processed data file (the one which is going to be put in the database) - Actually not needed, JSON data has only been saved during development
 
     # Setup file parsing
     f = ConfigParser()
