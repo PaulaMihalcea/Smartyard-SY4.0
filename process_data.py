@@ -4,6 +4,7 @@ from datetime import datetime  # For the current time
 from modules import update_db as u  # For updating the database
 from modules import min_date as m  # For finding the oldest date in which the db has been updated
 from modules import increase_day as i  # For (correctly) increasing the day and proceed with the parsing of old logs
+from modules import check_file as c  # For checking if the log for the current date actually exists
 import time  # For the sleep() method
 import os  # For checking if a log actually exists (and thus avoid errors if they don't)
 
@@ -17,6 +18,7 @@ index = str(f.get('database', 'index'))
 doc_type = str(f.get('database', 'doc_type'))
 
 period = f.getint('wait_time', 'period') / 1000  # Time is in milliseconds
+attempts = f.getint('wait_time', 'attempts')  # Number of attempts before exiting if no new logs have been found (typically needed when the sensor device has stopped working but this script is
 
 
 # Connection to the ElasticSearch cluster
@@ -63,6 +65,7 @@ else:
 
 print('')
 
+
 # Current day loading
 print('Starting data processing loop.')
 
@@ -71,13 +74,20 @@ print('')
 try:
     while True:
         print('Checking for new data...')
+
         if today[8:10] < str(datetime.now())[8:10]:  # Checks if the day has changed (increased)
             today = str(datetime.now())[0:10]
             raw_data_file = today + '.log'  # Updates the log file to read if midnight has passed
         else:
             pass
 
-        up_status = u.update_db(raw_data_file, last_dates, es, index, doc_type)  # Updates the database with data from raw_data_file
+        exists = c.check_file(raw_data_file, attempts, period)  # Checks if the log for the new day has been created
+
+        if exists:
+            up_status = u.update_db(raw_data_file, last_dates, es, index, doc_type)  # Updates the database with data from raw_data_file
+        else:  # No log with the current date has been found; after a number of attempts (specified in the variable "attempts"), the program automatically exists
+            print('Exiting program.')
+            exit()
 
         if up_status:
             print('Data has been successfully added to database. (' + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%s'))[:-7] + ')')  # More pretty prints for the user
