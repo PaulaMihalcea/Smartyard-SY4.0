@@ -91,7 +91,7 @@ try:
         exists = c.check_file(raw_data_file_path, attempts, period)  # Checks if the log for the new day has been created
 
         if exists:
-            up_status = u.update_db(raw_data_file_path, last_dates, es, index, doc_type)  # Updates the database with data from raw_data_file
+            up_status = u.update_db(raw_data_file_path, es, index, doc_type)  # Updates the database with data from raw_data_file
         else:  # No log with the current date has been found; after a number of attempts (specified in the variable "attempts"), the program automatically exists
             print('Exiting program.')
             exit()
@@ -106,4 +106,5 @@ try:
         time.sleep(period)  # Waits for the next check
 
 except KeyboardInterrupt:
-    print('\n Stopped by user. Database is not being updated anymore.')
+    print('\n Stopped by user. Database is not being updated anymore. Exiting program.')
+    exit()
