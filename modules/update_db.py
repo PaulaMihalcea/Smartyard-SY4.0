@@ -1,10 +1,9 @@
-def update_db(raw_data_file, last_dates, es, index, doc_type):
+def update_db(raw_data_file_path, last_dates, es, index, doc_type):
 
     from modules import df2json as d
 
     # Raw data file processing (raw to dataframe, then dataframe to json)
-    raw_data_file = 'logs/' + raw_data_file
-    data = d.df2json(raw_data_file)
+    data = d.df2json(raw_data_file_path)
     status = False  # Flag to return to the calling function; it says whether new entries have been added to the database or not
 
     # Adds to the ElasticSearch database the previously loaded data

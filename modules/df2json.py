@@ -1,4 +1,4 @@
-def df2json(raw_data_file):
+def df2json(raw_data_file_path):
 
     import json
     from modules import raw2df as r
@@ -15,7 +15,7 @@ def df2json(raw_data_file):
     f.read(setup_file_path)  # Parses the setup.ini file
 
     # Data loading and processing
-    df = r.raw2df(raw_data_file)  # Creates a data frame from the specified raw data file
+    df = r.raw2df(raw_data_file_path)  # Creates a data frame from the specified raw data file
     df.index.name = 'date'  # Sets the index column name
     df = df.reset_index()  # Resets the index to a column; useful for plotting
 

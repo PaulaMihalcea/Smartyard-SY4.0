@@ -46,10 +46,10 @@ print('')
 status = False  # Flag for telling the user if old logs have been added to the database (or not)
 print('Checking for old logs...')
 while today > date:
-    path = './logs/' + raw_data_file  # Dynamic path of the log file
+    raw_data_file_path = './logs/' + raw_data_file  # Dynamic path of the log file
 
-    if os.path.isfile(path):  # Checks if the log exists...
-        u.update_db(raw_data_file, last_dates, es, index, doc_type)  # This function will also rewrite the last day the database has been updated (the min)
+    if os.path.isfile(raw_data_file_path):  # Checks if the log exists...
+        u.update_db(raw_data_file_path, last_dates, es, index, doc_type)  # This function will also rewrite the last day the database has been updated (the min)
         status = True  # The database has been updated, so we're letting the user know it
     else:  # ...otherwise just goes to the next day, and continues checking
         pass
@@ -81,10 +81,11 @@ try:
         else:
             pass
 
-        exists = c.check_file(raw_data_file, attempts, period)  # Checks if the log for the new day has been created
+        raw_data_file_path = './logs/' + raw_data_file  # Dynamic path of the log file
+        exists = c.check_file(raw_data_file_path, attempts, period)  # Checks if the log for the new day has been created
 
         if exists:
-            up_status = u.update_db(raw_data_file, last_dates, es, index, doc_type)  # Updates the database with data from raw_data_file
+            up_status = u.update_db(raw_data_file_path, last_dates, es, index, doc_type)  # Updates the database with data from raw_data_file
         else:  # No log with the current date has been found; after a number of attempts (specified in the variable "attempts"), the program automatically exists
             print('Exiting program.')
             exit()

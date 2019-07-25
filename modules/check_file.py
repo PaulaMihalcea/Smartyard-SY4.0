@@ -1,15 +1,14 @@
-def check_file(raw_data_file, attempts, period):
+def check_file(raw_data_file_path, attempts, period):
 
     from datetime import datetime
     import time
     import os
 
     # Changed day checks (needed because if the sensor device has stopped working there can be "file not found" errors)
-    path = './logs/' + raw_data_file  # Dynamic path of the log file
     exists = False  # Flag for new logs (true if a new log has been found, false otherwise)
     attempt_no = 1
     while not exists and attempt_no <= attempts:
-        if os.path.isfile(path):  # Checks if the log already exists...
+        if os.path.isfile(raw_data_file_path):  # Checks if the log already exists...
             exists = True  # The new log has been created, so we can continue
         else:  # ...otherwise just goes to the next day, and continues checking
             print('')

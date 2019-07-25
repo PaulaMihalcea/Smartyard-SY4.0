@@ -1,4 +1,4 @@
-def raw2df(raw_data_file):
+def raw2df(raw_data_file_path):
 
     from configparser import ConfigParser
     import pandas as pd
@@ -21,7 +21,7 @@ def raw2df(raw_data_file):
     cols.append('MAC')  # Adds the MAC column, which specifies which device has retrieved the data in each row
 
     # Dataframe creation
-    h = open(raw_data_file, 'r')  # Opens the data file in read mode
+    h = open(raw_data_file_path, 'r')  # Opens the data file in read mode
 
     ls = []
     for x in h:  # Creates a list with all available data
