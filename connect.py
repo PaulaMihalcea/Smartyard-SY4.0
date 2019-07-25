@@ -2,6 +2,7 @@ from configparser import ConfigParser
 from datetime import datetime
 import time
 import pexpect
+import sys
 
 # Pexpect can be used for automating interactive applications.
 # It allows the script to spawn a child application and control it as if a human were typing commands.
@@ -12,10 +13,15 @@ import pexpect
 status = False  # Status flag; remains false until a connection has been established
 
 f = ConfigParser()
-
-f.read('config/setup.ini')  # Parses the setup.ini file
+setup_file_number = str(sys.argv[1])
+if int(setup_file_number) == 1:
+    f.read('config/setup.ini')  # Parses the setup.ini file
+else:
+    f.read('config/setup' + setup_file_number + '.ini')  # Parses the setup.ini file with the corresponding number (e.g. setup2.ini, etc.)
 
 device_mac = f.get('device_mac', 'value')
+
+logs_path = f.get('logs_path', 'value')
 
 connection_timeout = f.getint('wait_time', 'connection_timeout') / 1000  # All times are in milliseconds
 data_timeout = f.getint('wait_time', 'data_timeout') / 1000
@@ -75,7 +81,7 @@ while True:
                 while True:
 
                     t = datetime.now().isoformat()[:-3]  # Current date and time in standard ISO8601 format
-                    filename = 'logs/' + str(datetime.now().strftime('%Y-%m-%d.log'))
+                    filename = logs_path + '/' + str(datetime.now().strftime('%Y-%m-%d.log'))
                     raw_data = {t: {}}  # Temporarily saves the new data as a dictionary
 
                     parser = ConfigParser()

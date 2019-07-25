@@ -7,10 +7,15 @@ from modules import increase_day as i  # For (correctly) increasing the day and 
 from modules import check_file as c  # For checking if the log for the current date actually exists
 import time  # For the sleep() method
 import os  # For checking if a log actually exists (and thus avoid errors if they don't)
+import sys  # For getting the setup_db file as a command line argument
 
 # Setup
 f = ConfigParser()
-f.read('config/setup_db.ini')  # Parses the setup_db.ini file
+setup_file_number = str(sys.argv[1])
+if int(setup_file_number) == 1:
+    f.read('config/setup_db.ini')  # Parses the setup_db.ini file
+else:
+    f.read('config/setup_db' + setup_file_number + '.ini')  # Parses the setup_db.ini file with the corresponding number (e.g. setup_db2.ini, etc.)
 
 host = f.get('database', 'host')
 port = f.get('database', 'port')
@@ -20,6 +25,7 @@ doc_type = str(f.get('database', 'doc_type'))
 period = f.getint('wait_time', 'period') / 1000  # Time is in milliseconds
 attempts = f.getint('wait_time', 'attempts')  # Number of attempts before exiting if no new logs have been found (typically needed when the sensor device has stopped working but this script is
 
+logs_path = f.get('logs_path', 'value')
 
 # Connection to the ElasticSearch cluster
 print('Connecting to ElasticSearch database...')
@@ -46,7 +52,7 @@ print('')
 status = False  # Flag for telling the user if old logs have been added to the database (or not)
 print('Checking for old logs...')
 while today > date:
-    raw_data_file_path = './logs/' + raw_data_file  # Dynamic path of the log file
+    raw_data_file_path = './' + logs_path + '/' + raw_data_file  # Dynamic path of the log file
 
     if os.path.isfile(raw_data_file_path):  # Checks if the log exists...
         u.update_db(raw_data_file_path, last_dates, es, index, doc_type)  # This function will also rewrite the last day the database has been updated (the min)
@@ -81,7 +87,7 @@ try:
         else:
             pass
 
-        raw_data_file_path = './logs/' + raw_data_file  # Dynamic path of the log file
+        raw_data_file_path = './' + logs_path + '/' + raw_data_file  # Dynamic path of the log file
         exists = c.check_file(raw_data_file_path, attempts, period)  # Checks if the log for the new day has been created
 
         if exists:
