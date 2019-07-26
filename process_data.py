@@ -55,7 +55,7 @@ while today > date:
     raw_data_file_path = './' + logs_path + '/' + raw_data_file  # Dynamic path of the log file
 
     if os.path.isfile(raw_data_file_path):  # Checks if the log exists...
-        u.update_db(raw_data_file_path, last_dates, es, index, doc_type)  # This function will also rewrite the last day the database has been updated (the min)
+        u.update_db(raw_data_file_path, es, index, doc_type)  # This function will also rewrite the last day the database has been updated (the min)
         status = True  # The database has been updated, so we're letting the user know it
     else:  # ...otherwise just goes to the next day, and continues checking
         pass

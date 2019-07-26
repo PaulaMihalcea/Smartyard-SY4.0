@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 from datetime import datetime
+from modules import notify as n
 import time
 import pexpect
 import sys
@@ -59,8 +60,9 @@ while True:
             child.sendline('connect {0}'.format(device_mac))  # connect 54:6C:0E:80:3F:01 (sends the string to the spawned process (gatttool))
             print('Connecting to ' + str(device_mac) + '... (attempt no. ' + str(attempt_no) + '/' + str(max_attempts) + ')')
             child.expect('Connection successful', connection_timeout)  # Waits for the "Connection successful" gatttool message; timeouts in the specified time
+            n.notify('connected', 'successful', setup_file_number, device_mac)  # Sends an entry to the connection database, saying that the current device has connected at the current time
             status = True
-            attempt_no = 1
+            attempt_no = 1  # Resets the connection attempt counter
             print('Connection successful.')
 
             # Sensor configuration
@@ -110,6 +112,7 @@ while True:
                 user_status = True
                 child.sendline('disconnect')  # Disconnects from the BLE device
                 child.close(force=True)
+                n.notify('disconnected', 'keyboard_interrupt', setup_file_number, device_mac)  # Sends an entry to the connection database, saying that the current device has been disconnected because of a keyboard interrupt
                 status = False
                 print('Disconnected. Exiting program.')
                 exit()
@@ -118,6 +121,7 @@ while True:
             if status:
                 status = False
                 user_status = False
+                n.notify('disconnected', 'out_of_range', setup_file_number, device_mac)  # Sends an entry to the connection database, saying that the current device has been disconnected because of the device being out of range (or unavailable)
                 print('Disconnected, device out of range. Retrying.')
             else:
                 user_status = False

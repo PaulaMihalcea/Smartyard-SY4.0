@@ -11,10 +11,10 @@ def update_db(raw_data_file_path, es, index, doc_type):
 
     # Adds to the ElasticSearch database the previously loaded data
     for e in data:
-        for d, v in last_dates.items():
-            if e['MAC'] == d and v < e['date']:  # Adds new data to database only if more recent than the last item added for the current device (saved in the specific file last.date)
+        for r, v in last_dates.items():
+            if e['MAC'] == r and v < e['date']:  # Adds new data to database only if more recent than the last item added for the current device (saved in the specific file last.date)
                 es.index(index=index, doc_type=doc_type, body=e)  # Adds element to DB with an automatically generated unique id
-                last_dates[d] = e['date']  # Updates the last database update date (Warning: too many dates)
+                last_dates[r] = e['date']  # Updates the last database update date (Warning: too many dates)
                 status = True
             else:
                 pass  # Ignores an entry if it is already present in the database
