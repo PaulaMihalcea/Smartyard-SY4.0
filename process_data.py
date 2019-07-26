@@ -65,9 +65,9 @@ while today > date:
 
 print('Old logs check successful.')  # Some pretty prints to reassure the user (and in the beginning me, too)
 if status:
-    print('No old logs found.')
-else:
     print('Old logs successfully added to database.')
+else:
+    print('No old logs found.')
 
 print('')
 
