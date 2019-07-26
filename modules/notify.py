@@ -19,7 +19,7 @@ def notify(event, message, setup_file_number, device_mac):
     # Connection to the ElasticSearch cluster
     es = Elasticsearch([{'host': host, 'port': port}])
 
-    e = {'date': str(datetime.now().strftime('%Y-%m-%d.log')), 'device_mac': device_mac, 'event': event, 'message': message}
+    e = {'date': str(datetime.now().isoformat()[:-3]), 'device_mac': device_mac, 'event': event, 'message': message}
 
     # Event dispatch to the database
     es.index(index=index, doc_type=doc_type, body=e)  # Adds element to DB with an automatically generated unique id
