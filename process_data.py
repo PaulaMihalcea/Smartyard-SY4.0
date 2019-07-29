@@ -34,8 +34,23 @@ print('Connection successful.')
 
 
 # Raw data file selection
-with open('config/last.date', 'r') as f:
-    last_dates = eval(f.read())
+attempt_no = 1  # Number of attempts to read the last.dates file; the whole following block is a fix to an EOF exception that appears at times when trying to read the said file
+while True:
+    try:
+        with open('config/last.date', 'r') as f:
+            last_dates = eval(f.read())
+    except Exception:
+        print('Error while trying to read last.dates file, waiting for next check... (attempt no. ' + str(attempt_no) + '/' + str(attempts) + ')')
+        attempt_no += 1
+        time.sleep(period)
+        if attempt_no > attempts:
+            print('Error while trying to read last.dates file, maximum number of attempts reached. Exiting program.')
+            exit()
+        else:
+            continue
+    else:
+        break
+
 min_date = m.min_date(last_dates)  # Finds the last day the database has been updated (for any device)
 
 date = min_date
@@ -55,7 +70,7 @@ while today > date:
     raw_data_file_path = './' + logs_path + '/' + raw_data_file  # Dynamic path of the log file
 
     if os.path.isfile(raw_data_file_path):  # Checks if the log exists...
-        u.update_db(raw_data_file_path, es, index, doc_type)  # This function will also rewrite the last day the database has been updated (the min)
+        u.update_db(raw_data_file_path, es, index, doc_type, attempts, period)  # This function will also rewrite the last day the database has been updated (the min)
         status = True  # The database has been updated, so we're letting the user know it
     else:  # ...otherwise just goes to the next day, and continues checking
         pass
@@ -91,7 +106,7 @@ try:
         exists = c.check_file(raw_data_file_path, attempts, period)  # Checks if the log for the new day has been created
 
         if exists:
-            up_status = u.update_db(raw_data_file_path, es, index, doc_type)  # Updates the database with data from raw_data_file
+            up_status = u.update_db(raw_data_file_path, es, index, doc_type, attempts, period)  # Updates the database with data from raw_data_file
         else:  # No log with the current date has been found; after a number of attempts (specified in the variable "attempts"), the program automatically exists
             print('Exiting program.')
             exit()
