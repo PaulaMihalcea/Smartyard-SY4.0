@@ -16,7 +16,7 @@ This project has been created as a **Computer Engineering thesis** at [Universit
 - **stores** said data in an **Elasticsearch** database, and finally
 - enables its graphical **visualization** using **Kibana**.
 
-The complete code of the project is hereby provided as is, and is fully documented in the [`thesis.pdf`](thesis.pdf) file (in the Italian language) along with the detailed hardware configuration and requirements of the system.
+The complete code of the project is hereby provided as is, and is fully documented in the [`thesis.pdf`](thesis.pdf) and [`slides.pdf`](slides.pdf) files (in the Italian language), complete with the detailed hardware configuration and requirements of the system.
 
   <p align="center">
     <img src="https://github.com/PaulaMihalcea/Smartyard-SY4.0/blob/master/architecture.png" width="80%" height="80%">
